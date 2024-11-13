@@ -6,3 +6,4 @@ node_modules/
 cloudinary_python.txt
 env.py
 venv
+.venv
