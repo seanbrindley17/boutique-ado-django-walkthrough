@@ -32,6 +32,8 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+# Added "home" app that was created
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -42,6 +44,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "home",
 ]
 
 MIDDLEWARE = [
@@ -57,10 +60,15 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "boutique_ado.urls"
 
+# Within DIRS, join the templates from "templates" and "templates/allauth" to wire up to app
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            os.path.join(BASE_DIR, "templates"),
+            os.path.join(BASE_DIR, "templates", "allauth"),
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
