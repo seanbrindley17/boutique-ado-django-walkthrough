@@ -4,6 +4,10 @@ from django.db import models
 # Create your models here.
 # Category inherits from models.Model
 class Category(models.Model):
+    class Meta:
+        # Changes the name on the Django model to be grammatically correct
+        verbose_name_plural = "Categories"
+
     # name is more programmatic for seatching
     name = models.CharField(max_length=254)
     # null & blank being true makes it optional. nicer display name
