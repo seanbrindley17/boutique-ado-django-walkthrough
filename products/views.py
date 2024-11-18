@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 # from products/models.py import Product class
 from .models import Product
@@ -17,3 +17,16 @@ def all_products(request):
 
     # Returns products.html, needs context as some things will be send back to template
     return render(request, "products/products.html", context)
+
+
+# View to show individual product details
+def product_detail(request, product_id):
+
+    # Returns a product by it's project ID, or a 404 error if not found
+    product = get_object_or_404(Product, pk=product_id)
+
+    # Allows product above to be available in template.
+    context = {"product": product}
+
+    # Returns product_detail.html, needs context as some things will be send back to template
+    return render(request, "products/product_detail.html", context)
