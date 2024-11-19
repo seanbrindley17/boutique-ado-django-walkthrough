@@ -128,5 +128,55 @@
         </div>
     </div>
 </div>
+<!-- Link to send user to the top of the product list -->
+<div class="btt-button shadow-sm rounded-0 border border-black">
+    <a href="" class="btt-link d-flex h-100">
+        <i class="fas fa-arrow-up text-black mx-auto my-auto"></i>
+    </a>
+</div>
 
+{% endblock %}
+<!-- block.super appends code to anything already in the block as opposed to replacing it -->
+{% block postloadjs %}
+    {{ block.super }}
+    <script type="text/javascript">
+        // Handles the click event function upon the user clicking the btt-button above 
+        $(".btt-link").click(function(e) {
+            // Scrolls to the top of the page
+            window.scrollTo(0,0)
+        })
+    </script>
+
+    <script type="text/javascript">
+        // Capture change event in the sort selector
+        $("#sort-selector").change(function() {
+            // selector variable equal to the selector changed to
+            var selector = $(this);
+            // currentURL variabl equal to a new URL object that takes in the current window's location.
+            // Allows the replacement of the current get parameters to update sorting method
+            var currentUrl = new URL(window.location);
+            
+            // selectedVal is the value attribute of the option element in the selector box
+            var selectedVal = selector.val();
+            // If the value is not reset to the default and instead to another sorting method
+            if(selectedVal != "reset"){
+                // Because the sort and directions in the options are split by _ i.e. "price_asc"
+                // sort gets the sort option i.e. price
+                var sort = selectedVal.split("_")[0];
+                // direction gets either the asc or desc option 
+                var direction = selectedVal.split("_")[1];
+
+                // Replaces the GET parameters in the URL using searchParams.set()
+                currentUrl.searchParams.set("sort", sort);
+                currentUrl.searchParams.set("direction", direction)
+            } else {
+                // If the user has selected the reset option, sort and direction parameters are deleted and the location is replaced and page reloaded with products as default
+                currentUrl.searchParams.delete("sort");
+                currentUrl.searchParams.delete("direction")
+
+                // Replace the URL with the currentURL from above and replacing the location will also reload the page
+                window.location.replace(currentUrl);
+            }
+        })
+    </script>
 {% endblock %}
