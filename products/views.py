@@ -4,8 +4,8 @@ from django.contrib import messages
 # Q is a query sorting helper, explanation in Queries and Categories part 1
 from django.db.models import Q
 
-# from products/models.py import Product class
-from .models import Product
+# from products/models.py import Product and Category class
+from .models import Product, Category
 
 # Create your views here.
 
@@ -17,8 +17,19 @@ def all_products(request):
     products = Product.objects.all()
     # Should allow products page to initially load without throwing an error for having no search term
     query = None
+    categories = None
 
     if request.GET:
+        # If a category is searched for
+        if "category" in request.GET:
+            # Split into a list of categories by comma, if applicable
+            categories = request.GET["category"].split(",")
+            # Filter products to show only products whose category name is in the list
+            products = products.filter(category__name__in=categories)
+            # Coverts the list of strings of category names passed through URL to their actual category object
+            categories = Category.objects.filter(name__in=categories)
+            # double underscore __ is best practice when making django query logic
+
         # "q" corresponds to the name field in the search input
         if "q" in request.GET:
             # sets the search value from "q" to variable called query
@@ -39,6 +50,7 @@ def all_products(request):
     context = {
         "products": products,
         "search_term": query,
+        "current_categories": categories,
     }
 
     # Returns products.html, needs context as some things will be send back to template
