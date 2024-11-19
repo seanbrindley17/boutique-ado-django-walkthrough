@@ -101,6 +101,7 @@ body {
     }
 
     body {
+        /* the full viewport minus the height of the header elements */
         height: calc(100vh - 116px);
     }
 }

@@ -1,4 +1,8 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect, reverse
+from django.contrib import messages
+
+# Q is a query sorting helper, explanation in Queries and Categories part 1
+from django.db.models import Q
 
 # from products/models.py import Product class
 from .models import Product
@@ -11,9 +15,31 @@ def all_products(request):
 
     # Returns all products from the Product database
     products = Product.objects.all()
+    # Should allow products page to initially load without throwing an error for having no search term
+    query = None
+
+    if request.GET:
+        # "q" corresponds to the name field in the search input
+        if "q" in request.GET:
+            # sets the search value from "q" to variable called query
+            query = request.GET["q"]
+            # If query is blank
+            if not query:
+                # Flash message
+                messages.error(request, "No search criteria entered")
+                # Redirect to products url
+                return redirect(reverse("products"))
+            # Sets queries to a Q object where name or description contains the query entered
+            # The | between them generates the "or", and "i" before contains makes the query case insensitive
+            queries = Q(name__icontains=query) | Q(description__icontains=query)
+            # Filter the products by the query seached for
+            products = products.filter(queries)
 
     # Allows products to be available in template. Like doing products=products in a Flask function in the render_template
-    context = {"products": products}
+    context = {
+        "products": products,
+        "search_term": query,
+    }
 
     # Returns products.html, needs context as some things will be send back to template
     return render(request, "products/products.html", context)
