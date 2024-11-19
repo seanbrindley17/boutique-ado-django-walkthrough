@@ -18,8 +18,33 @@ def all_products(request):
     # Should allow products page to initially load without throwing an error for having no search term
     query = None
     categories = None
+    sort = None
+    direction = None
 
     if request.GET:
+        # If a sort request by the user is chosen
+        if "sort" in request.GET:
+            # Gets the sort request and stores in "sortkey"
+            sortkey = request.GET["sort"]
+            # storing the sort in sortkey allows the original field the was sorted on to be preserved
+            sort = sortkey
+            # Check if sortkey is equal to "name"
+            if sortkey == "name":
+                # If so, store sortkey in new variable named lower_name if user is sorting by name
+                sortkey = "lower_name"
+                # using products.annotate adds temporary field to model to allow for case insensitive sorting in field name in this case
+                products = products.annotate(lower_name=Lower("name"))
+
+            if "direction" in request.GET:
+                # Checks direction in sort request
+                direction = request.GET["direction"]
+                # If it's descending
+                if direction == "desc":
+                    # Format the string using "f" and placing a minus sign before { } with the variable in to reverse it
+                    sortkey = f"-{sortkey}"
+            # Sorts the products based on the logic above using order_by()
+            products = products.order_by(sortkey)
+
         # If a category is searched for
         if "category" in request.GET:
             # Split into a list of categories by comma, if applicable
@@ -45,12 +70,15 @@ def all_products(request):
             queries = Q(name__icontains=query) | Q(description__icontains=query)
             # Filter the products by the query seached for
             products = products.filter(queries)
+    # Tells the template the current sorting logic using string formatting
+    current_sorting = f"{sort}_{direction}"
 
     # Allows products to be available in template. Like doing products=products in a Flask function in the render_template
     context = {
         "products": products,
         "search_term": query,
         "current_categories": categories,
+        "current_sorting": current_sorting,
     }
 
     # Returns products.html, needs context as some things will be send back to template
