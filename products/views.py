@@ -34,6 +34,11 @@ def all_products(request):
                 sortkey = "lower_name"
                 # using products.annotate adds temporary field to model to allow for case insensitive sorting in field name in this case
                 products = products.annotate(lower_name=Lower("name"))
+            # Check if the sortkey is a category
+            if sortkey == "category":
+                # Double underscore allows drilling into a related model
+                # Essentially makes products = products.order_by(category__name)
+                sortkey = "category__name"
 
             if "direction" in request.GET:
                 # Checks direction in sort request
