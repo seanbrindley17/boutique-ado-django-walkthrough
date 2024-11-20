@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block page_header %}
+<div class="header-container">
+    <div class="row">
+        <div class="col"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+    <!-- White display overlay to cover the hero image -->
+    <div class="display-overlay"></div>
+    <!-- Shopping Bag container -->
+    <div class="container mb-2">
+        <!-- Title -->
+        <div class="row">
+            <div class="col">
+                <hr>
+                <h2 class="logo-font mb-4">Shopping Bag</h2>
+                <hr>
+            </div>
+        </div>
+
+        <!-- Bag Items display -->
+        <div class="row">
+            <div class="col">
+                <!-- If statement to display items in bag -->
+                {% if bag_items %}
+                <!-- Selected items displayed in this table -->
+                <div class="table-responsive rounded"></div>
+                {% else %}
+                <!-- No items will return the your bag is empty and a link back to the products page -->
+                <p class="lead mb-5">Your bag is empty.</p>
+                <a href="{% url 'products' %}" class="btn btn-outline-black rounded-0 btn-lg">
+                    <span class="icon">
+                        <i class="fas fa-chevron-left"></i>
+                    </span>
+                    <span class="text-uppercase">Keep Shopping</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
