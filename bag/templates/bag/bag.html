@@ -29,7 +29,9 @@
                 <!-- If statement to display items in bag -->
                 {% if bag_items %}
                 <!-- Selected items displayed in this table -->
-                <div class="table-responsive rounded"></div>
+                <div class="table-responsive rounded">
+                    {{ bag_items }}
+                </div>
                 {% else %}
                 <!-- No items will return the your bag is empty and a link back to the products page -->
                 <p class="lead mb-5">Your bag is empty.</p>

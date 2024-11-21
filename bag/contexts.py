@@ -1,6 +1,10 @@
 # For financial transactions, Decimal is preferred to Float as Float has a tendency for rounding errors
 from decimal import Decimal
 from django.conf import settings
+from django.shortcuts import get_object_or_404
+
+# From models.py in products directory, import Product class
+from products.models import Product
 
 
 # This is a context processor. its purpose is to make this dictionary available to all templates across the entire application
@@ -10,6 +14,18 @@ def bag_contents(request):
     bag_items = []
     total = 0
     product_count = 0
+    bag = request.session.get("bag", {})
+
+    # For each item ID and quantity in the bag from the session
+    for item_id, quantity in bag.items():
+        # Get the product using get_object, primary key is it's item id
+        product = get_object_or_404(Product, pk=item_id)
+        # Product multiplied by quantity bought is added to total
+        total += quantity * product.price
+        # Increments product_count by the quantity
+        product_count += quantity
+        # Add to the bag_items dictionary the ID and quantity of item and also the product object itself
+        bag_items.append({"item_id": item_id, "quantity": quantity, "product": product})
 
     # Check if the bag items total cost is less than the free delivery threshold
     if total < settings.FREE_DELIVERY_THRESHOLD:

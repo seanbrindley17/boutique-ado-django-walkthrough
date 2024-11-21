@@ -101,6 +101,7 @@
                                     <div><i class="fas fa-shopping-bag fa-lg"></i></div>
                                     <p class="my-0">
                                         <!-- Check if grand_total exists, which will be the total cost of items in user's basket -->
+                                         <!-- grand_total gotten from context processor in bag/contexts.py -->
                                         {% if grand_total %}
                                             <!-- Display the total formatted to 2 decimal places, as it will be a monetary cost -->
                                             £{{ grand_total|floatformat:2 }}
