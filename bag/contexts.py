@@ -16,16 +16,37 @@ def bag_contents(request):
     product_count = 0
     bag = request.session.get("bag", {})
 
-    # For each item ID and quantity in the bag from the session
-    for item_id, quantity in bag.items():
-        # Get the product using get_object, primary key is it's item id
-        product = get_object_or_404(Product, pk=item_id)
-        # Product multiplied by quantity bought is added to total
-        total += quantity * product.price
-        # Increments product_count by the quantity
-        product_count += quantity
-        # Add to the bag_items dictionary the ID and quantity of item and also the product object itself
-        bag_items.append({"item_id": item_id, "quantity": quantity, "product": product})
+    # For each item ID and quantity (item_data) in the bag from the session
+    for item_id, item_data in bag.items():
+        # Check if the item data is just an integer, if so then it will just be quantity added and not size
+        if isinstance(item_data, int):
+            # Get the product using get_object, primary key is it's item id
+            product = get_object_or_404(Product, pk=item_id)
+            # Product multiplied by quantity bought is added to total
+            total += item_data * product.price
+            # Increments product_count by the quantity
+            product_count += item_data
+            # Add to the bag_items dictionary the ID and quantity of item and also the product object itself
+            bag_items.append(
+                {"item_id": item_id, "quantity": item_data, "product": product}
+            )
+        # If there are item sizes in the data being added
+        else:
+            product = get_object_or_404(Product, pk=item_id)
+            # Iterate through the inner dictionary of "items_by_size"
+            for size, quantity in item_data["items_by_size"].items():
+                # Increment total and product count accordingly
+                total += quantity * product.price
+                product_count += quantity
+                # Add "size" to the bag_items dictionary
+                bag_items.append(
+                    {
+                        "item_id": item_id,
+                        "quantity": item_data,
+                        "product": product,
+                        "size": size,
+                    }
+                )
 
     # Check if the bag items total cost is less than the free delivery threshold
     if total < settings.FREE_DELIVERY_THRESHOLD:
