@@ -52,6 +52,22 @@
                     <!-- As the form uses POST, need a csrf_token else Django won't allow the form to be submitted -->
                     {% csrf_token %}
                     <div class="form-row">
+                        <!-- Assign products that have the has_sizes = true attribute to variable "s" -->
+                        {% with product.has_sizes as s %}
+                            <!-- If the product has the has_size=true attribute -->
+                            {% if s %}
+                            <!-- Select dropdown of sizes -->
+                            <div class="col-12">
+                                <p><strong>Size:</strong></p>
+                                <select name="product_size" id="id_product_size" class="form-control rounded-0 w-50">
+                                    <option value="xs">XS</option>
+                                    <option value="s">S</option>
+                                    <option value="m" selected>M</option>
+                                    <option value="l">L</option>
+                                    <option value="xl">XL</option>
+                                </select>
+                            </div>
+                            {% endif %}
                         <!-- Column for quantity selection -->
                         <div class="col-12">
                             <p class="mt-3"><strong>Quantity:</strong></p>
@@ -64,7 +80,7 @@
                         </div>
 
                         <!-- Column containing Go Back and Submit buttons -->
-                        <div class="col-12">
+                        <div class="col{% if s %}-12 mt-2{% endif %}">
                             <a href="{% url 'products' %}" class="btn btn-outline-black rounded-0 mt-5">
                                 <span class="icon">
                                     <i class="fas fa-chevron-left"></i>
@@ -78,6 +94,7 @@
                         <!-- Hidden input for submitting a field called "redirect_url" which has a value of the current URL -->
                          <!-- By sending current URL, can redirect user back to the same page when their product is added to bag instead of back to products -->
                         <input type="hidden" name="redirect_url" value="{{ request.path }}">
+                        {% endwith %}
                     </div>
                 </form>
             </div>

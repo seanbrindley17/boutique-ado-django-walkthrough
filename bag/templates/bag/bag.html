@@ -48,9 +48,11 @@
                             <td class="p-3 w-25">
                                 <img src="{{ item.product.image.url }}" alt="" class="img-fluid rounded">
                             </td>
-                            <!-- Second row contains Product's name and it's SKU -->
+                            <!-- Second row contains Product's name, size and it's SKU -->
                             <td class="py-3">
                                 <p class="my-0"><strong>{{ item.product.name }}</strong></p>
+                                <!-- If an item has sizes, display the size in upper case, otherwise display N/A -->
+                                <p class="my-0">Size: <strong>{% if item.product.has_sizes %}{{ item.size|upper }}{% else %}N/A{% endif %}</strong></p>
                                 <p class="my-0 small text-muted">SKU: {{ item.product.sku|upper }}</p>
                             </td>
                             <!-- third row contains product price -->
