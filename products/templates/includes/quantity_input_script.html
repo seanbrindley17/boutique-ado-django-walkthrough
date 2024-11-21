@@ -1,0 +1,60 @@
+<!-- Script file in html as it's just for one script element at the end of one template, saves fannying around with static files -->
+<script type="text/javascript">
+
+    // For enabling and disbling based on value of input they're controlling
+    // Each input is assosciated with a specific product id so it's passed in the function
+    function handleEnableDisable(itemId) {
+        // Gets current value by parsing the integer of the item based on it's ID
+        // Uses backticks `` to place variable within the string
+        var currentValue = parseInt($(`#id_qty_${itemID}`).val());
+        // Disables minus button if the current value is less than 2, so it will be disabled if 1 exists as the value
+        var minusDisabled = currentValue < 2;
+        // Disabled plus button if 99 exists as the value
+        var plusDisabled = currentValue > 98;
+        // Uses prop() method to set disabled based on whether the values fit the disabling criteria
+        $(`#decrement-qty_${itemId}`).prop("disabled", minusDisabled);
+        $(`#increment-qty_${itemId}`).prop("disabled", plusDisabled);
+    }
+
+    // Should stop users being able to decrement the value to 0 as the page loads with 1 as the value by default
+    var allQtyInputs = $(".qty_input");
+    for (var i = 0; i < allQtyInputs.length; i++){
+        var itemId = $(allQtyInputs[i]).data("item_id");
+        handleEnableDisable(itemId)
+    }
+
+    // Calls the function each time the input is changed, i.e. by built in up and down arrows
+    $(".qty_input").change(function() {
+        var itemId = $(this).data("item_id");
+        handleEnableDisable(itemId);
+    })
+
+    // On the click event of the increment qty button (plus)
+    $(".increment-qty").click(function(e) {
+        // Prevent the default button action
+        e.preventDefault();
+        // Find closest input. From the button element (this), go up the DOM tree using .closest() to find the closest .input-group class.
+        // Then within the .input-group found, use find() to go down it's DOM to find the first element with the .qty-input class
+        var closestInput = $(this).closest(".input-group").find(".qty-input")[0];
+        // Store the integer value of closestInput in currentValue
+        var currentValue = parseInt($(closestInput).val());
+        // Set the input box new value to the current value plus 1
+        $(closestInput).val(currentValue + 1);
+        // Get itemID when button is clicked using .data() method on the item_id attribute in the buttons
+        var itemID = $(this).data("item_id");
+        // Pass into handleEnable/Disable function
+        handleEnableDisable(itemID);
+    })
+
+    // On the click event of the decrement qty button (minus)
+    // Same as above except note below
+    $(".decrement-qty").click(function(e) {
+        e.preventDefault();
+        var closestInput = $(this).closest(".input-group").find(".qty-input")[0];
+        var currentValue = parseInt($(closestInput).val());
+        // currentValue minus 1 instead of plus 1
+        $(closestInput).val(currentValue - 1);
+        var itemID = $(this).data("item_id");
+        handleEnableDisable(itemID);
+    })
+</script>
