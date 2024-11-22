@@ -61,7 +61,44 @@
                             </td>
                             <!-- forth row contains quanity -->
                             <td class="py-3">
-                                <p class="my-0">{{ item.quantity }}</p>
+                                <form action="" method="post" class="form update-form">
+                                    {$ csrf_token $}
+                                    <div class="form-group">
+                                        <!-- Buttons to increment and decrement quantity -->
+                                        <div class="input-group">
+                                            <!-- Decrement -->
+                                            <div class="input-group-prepend">
+                                                <!-- Template variable is called item, so data-item_id needs to be item.item_id instead of product.id -->
+                                                <button class="decrement-qty btn btn-sm btn-black rounded-0" data-item_id="{{ item.item_id }}"
+                                                    id="decrement-qty_{{ item.item_id }}">
+                                                    <span>
+                                                        <i class="fas fa-minus fa-sm"></i>
+                                                    </span>
+                                                </button>
+                                            </div>
+                                            <!-- value is the quantity of item in the bag -->
+                                            <input class="form-control form-control-sm qty_input" type="number" name="quantity" value="{{ item.quantity }}" min="1" max="99"
+                                                data-item_id="{{ item.item_id }}" id="id_qty_{{ item.item_id }}">
+                                            <div class="input-group-append">
+                                                <button class="increment-qty btn btn-sm btn-black rounded-0" data-item_id="{{ item.item_id }}"
+                                                    id="increment-qty_{{ item.item_id }}">
+                                                    <span>
+                                                        <i class="fas fa-plus fa-sm"></i>
+                                                    </span>
+                                                </button>
+                                            </div>
+                                            {% if item.product.has_sizes %}
+                                                <!-- Hidden input to submit size of item user wants to update or remove -->
+                                                <input type="hidden" name="product_size" value="{{ item.size }}">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </form>
+                                <!-- Update item quantity within bag. Update link javascript -->
+                                <a href="" class="update-link text-info"><small>Update</small></a>
+                                <!-- Remove Item. remove item javascript -->
+                                 <!-- The ID and data-size classes discern what specific item is being removed and what size -->
+                                <a href="" class="remove-item text-danger float-right" id="remove_{{ item.item_id }}" data-size="{{ item.size }}"><small>Remove</small></a>
                             </td>
                             <!-- fifth row contains subtotal -->
                             <td class="py-3">
@@ -115,4 +152,46 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block postloadjs %}
+<!-- include parent block -->
+{{ block.super }}
+<!-- include quantity_input_script for the increment and decrement quantity buttons -->
+{% include "products/includes/quantity_input_script.html" %}
+
+<script type="text/javascript">
+    // On the click event of the <a> element with the update-link class 
+    $(".update-link").click(function(e) {
+        // Use .prev() (previous) method to find last seen update form in the DOM
+        // Store in variable called form
+        var form = $(this).prev(".update-form");
+        // Call the new form variable's submit method
+        form.submit();
+    })
+
+    // On the click even of the <a> element with the remove-item class
+    $(".remove-item").click(function(e){
+        // Need csrf token as form will be Posted
+        // Need actual token rendered with {{ }} instead of {% %}
+        var csrfToken = "{{ csrf_token }}";
+        // itemId got from taking the id attribute from the click event and splitting into "remove_" & {{ item.item_id }} 
+        // take the second item in the split array "[1]"
+        var itemId = $(this).attr("id").split("remove_")[1];
+        // size got from the data-size html attribute in the click event
+        var size = $(this).data("size");
+        // url is template literal for the itemId that will be removed
+        var url = `/bag/remove/${itemId}`;
+        // data variable contains csrf middleware token key which contains the csrf token and size variables from above
+        // this should match the csrf token expected when the form is posted to the server
+        var data = {"csrfmiddlewaretoken": csrfToken, "size": size};
+
+        // The url and data collected above is posted using jquery $.post() with url and data as parameters
+        $.post(url, data)
+        // When done, excute function to reload the page
+        .done(function() {
+            location.reload();
+        });
+    })
+</script>
 {% endblock %}
